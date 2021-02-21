@@ -38,7 +38,7 @@ A Canteen Automation project targeted to mainly DAIICT Canteens :)
     - Run These 3 queries in pgAdmin
       ```
       INSERT INTO roles(name) VALUES('ROLE_USER');
-      INSERT INTO roles(name) VALUES('ROLE_MODERATOR');
+      INSERT INTO roles(name) VALUES('ROLE_OWNER');
       INSERT INTO roles(name) VALUES('ROLE_ADMIN');
       ```
     - build your project in IntelliJ IDEA and Run it.
