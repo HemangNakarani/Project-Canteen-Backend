@@ -15,6 +15,4 @@ public interface FoodItemRepository extends JpaRepository<FoodItem,Long> {
 
     List<FoodItem> findByCanteen_id(@NonNull Long id);
 
-    void deleteById(@NonNull Long id);
-
 }
