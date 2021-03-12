@@ -1,11 +1,9 @@
 package io.sen.canteenia.models;
-import com.sun.istack.Nullable;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Entity
@@ -29,7 +27,6 @@ public class Canteen implements Serializable {
         this.opened = opened;
     }
 
-    @ColumnDefault("")
     private String altName;
 
     @ColumnDefault("true")

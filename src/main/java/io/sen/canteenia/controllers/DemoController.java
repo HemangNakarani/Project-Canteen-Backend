@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DemoController {
 
-    @GetMapping("/")
+    @GetMapping("hi/")
     public String Home()
     {
-        return "<h1>Ahh Shit !! Here we go.</h1>";
+        return "<h1>Heyy Welcome !! This is Canteenia Server.</h1>The Software Engineering Project @DAIICT";
     }
 
 }
