@@ -1,0 +1,17 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo "Enter the pre-build phase"
+  build:
+    commands:
+      - echo "Entered build phase"
+      - mvn clean install
+  post_build:
+    commands:
+      - echo "Entered post-build phase"
+      - mv target/final ./
+
+artifacts:
+  files:
+    - final/**/*
