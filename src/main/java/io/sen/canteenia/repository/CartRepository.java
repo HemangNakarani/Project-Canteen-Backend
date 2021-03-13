@@ -1,16 +1,17 @@
 package io.sen.canteenia.repository;
 
+import io.sen.canteenia.models.CartItem;
 import io.sen.canteenia.models.FoodItem;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository
-public interface FoodItemRepository extends JpaRepository<FoodItem,Long> {
+public interface CartRepository extends JpaRepository<CartItem,Long> {
 
-    List<FoodItem> findAllByAvailableEquals(Boolean bool);
+    List<CartItem> findByUserid(Long id);
 
-    List<FoodItem> findByCanteen_id(@NonNull Long id);
+    boolean existsAllByUseridAndCartfooditem(Long uid, FoodItem fitem);
 
 }
