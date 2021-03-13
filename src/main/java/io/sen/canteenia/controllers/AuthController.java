@@ -15,6 +15,7 @@ import io.sen.canteenia.repository.UserRepository;
 import io.sen.canteenia.security.jwt.JwtUtils;
 import io.sen.canteenia.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -56,6 +57,9 @@ public class AuthController {
 
 	@Autowired
 	private EmailSenderService emailSenderService;
+
+	@Value("${io.sen.canteenia.serverURL}")
+	private String serverURL;
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -147,7 +151,7 @@ public class AuthController {
 				message.setTo(email);
 				message.setSubject("Reset Password For McDA's");
 				message.setText(emailUtils.getPasswordResetEmailTemplate(user.getUsername(),
-								"http://localhost:8080/api/auth/reset-password?token="+ jwtUtils.genrateTokenFromPasswordHash(user.getUsername(), user.getPassword()) + "&email=" + email),
+								serverURL+"/api/auth/reset-password?token="+ jwtUtils.genrateTokenFromPasswordHash(user.getUsername(), user.getPassword()) + "&email=" + email),
 						true);
 			}
 		});
