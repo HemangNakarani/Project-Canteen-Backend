@@ -18,6 +18,8 @@ public class FoodItem implements Serializable {
 
     private boolean available = true;
 
+    private String image_url;
+
     private int stars = 0;
 
     private int number_of_rating = 0;
@@ -32,11 +34,12 @@ public class FoodItem implements Serializable {
     public FoodItem() {
     }
 
-    public FoodItem(String name, String description, int basePrise, Long canteen_id) {
+    public FoodItem(String name, String description, int basePrise, Long canteen_id, String image_url) {
         this.name = name;
         this.description = description;
         this.basePrise = basePrise;
         this.canteen_id = canteen_id;
+        this.image_url = image_url;
     }
 
     public Long getId() {
@@ -101,5 +104,13 @@ public class FoodItem implements Serializable {
 
     public void setCanteen_id(Long canteen_id) {
         this.canteen_id = canteen_id;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 }
