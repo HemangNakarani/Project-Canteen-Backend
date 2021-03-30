@@ -9,15 +9,18 @@ public class AddFoodItemRequest {
 
     private String description = "";
 
+    private String image_url;
+
     @NotBlank
     private int basePrise;
 
     public AddFoodItemRequest() {
     }
 
-    public AddFoodItemRequest(@NotBlank String name, String description, @NotBlank int basePrise) {
+    public AddFoodItemRequest(@NotBlank String name, String description, String image_url, @NotBlank int basePrise) {
         this.name = name;
         this.description = description;
+        this.image_url = image_url;
         this.basePrise = basePrise;
     }
 
@@ -35,6 +38,14 @@ public class AddFoodItemRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
     public int getBasePrise() {

@@ -51,7 +51,7 @@ public class FoodManageController {
         UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Canteen canteen = getCanteen(userDetails);
 
-        FoodItem foodItem = foodItemRepository.save(new FoodItem(addFoodItemRequest.getName(),addFoodItemRequest.getDescription(),addFoodItemRequest.getBasePrise(),canteen.getId()));
+        FoodItem foodItem = foodItemRepository.save(new FoodItem(addFoodItemRequest.getName(),addFoodItemRequest.getDescription(),addFoodItemRequest.getBasePrise(),canteen.getId(), addFoodItemRequest.getImage_url()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(foodItem);
     }
