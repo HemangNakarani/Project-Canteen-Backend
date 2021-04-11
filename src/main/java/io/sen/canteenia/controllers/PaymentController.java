@@ -1,7 +1,7 @@
 package io.sen.canteenia.controllers;
 
-import com.paytm.pg.merchant.PaytmChecksum;
 import io.sen.canteenia.POJO.PaytmDetails;
+import io.sen.canteenia.configuration.PaytmHashConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -82,13 +82,13 @@ public class PaymentController {
     }
 
     private boolean validateCheckSum(TreeMap<String, String> parameters, String paytmChecksum) throws Exception {
-        return PaytmChecksum.verifySignature(parameters,
+        return PaytmHashConfig.verifySignature(parameters,
                 paytmDetails.getMerchantKey(), paytmChecksum);
     }
 
 
     private String getCheckSum(TreeMap<String, String> parameters) throws Exception {
-        return PaytmChecksum.generateSignature(parameters, paytmDetails.getMerchantKey());
+        return PaytmHashConfig.generateSignature(parameters, paytmDetails.getMerchantKey());
     }
 
 }
