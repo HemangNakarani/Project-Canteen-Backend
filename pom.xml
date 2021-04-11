@@ -17,13 +17,6 @@
 		<java.version>1.8</java.version>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>my-repo1</id>
-			<url>http://artifactorypg.paytm.in/artifactory/libs-release </url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 
 		<dependency>
@@ -101,12 +94,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.paytm</groupId>
-			<artifactId>paytm-checksum</artifactId>
-			<version>1.2.0</version>
 		</dependency>
 
 	</dependencies>
