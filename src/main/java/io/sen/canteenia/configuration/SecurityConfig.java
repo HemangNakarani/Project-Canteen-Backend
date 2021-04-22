@@ -16,7 +16,7 @@ public class SecurityConfig {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000","https://canteenia.hemangnakarani.me"));
+        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000","https://canteenia.hemangnakarani.me","https://securegw-stage.paytm.in","null"));
         config.addAllowedHeader("*");
         config.addAllowedMethod("OPTIONS");
         config.addAllowedMethod("HEAD");
