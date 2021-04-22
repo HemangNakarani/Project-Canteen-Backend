@@ -2,11 +2,15 @@ package io.sen.canteenia.controllers;
 
 import io.sen.canteenia.models.Canteen;
 import io.sen.canteenia.models.FoodItem;
+import io.sen.canteenia.models.OrderedItem;
 import io.sen.canteenia.models.User;
 import io.sen.canteenia.payload.request.AddFoodItemRequest;
 import io.sen.canteenia.payload.request.UpdateFoodItemRequest;
+import io.sen.canteenia.payload.response.ForbiddenResponse;
+import io.sen.canteenia.payload.response.UpdatedResponse;
 import io.sen.canteenia.repository.CanteenRepository;
 import io.sen.canteenia.repository.FoodItemRepository;
+import io.sen.canteenia.repository.OrderedItemRepository;
 import io.sen.canteenia.repository.UserRepository;
 import io.sen.canteenia.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +36,16 @@ public class FoodManageController {
     CanteenRepository canteenRepository;
 
     @Autowired
+    OrderedItemRepository orderedItemRepository;
+
+    @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ForbiddenResponse forbiddenResponse;
+
+    @Autowired
+    UpdatedResponse updatedResponse;
 
     @GetMapping("/")
     public ResponseEntity<?> getItems() {
@@ -78,8 +91,8 @@ public class FoodManageController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> setAvailibilityItem(@PathVariable("id") Long id,@Valid @RequestParam("available") Boolean available) {
+    @PutMapping("/set-availibility")
+    public ResponseEntity<?> setAvailibilityItem(@Valid @RequestParam("id") Long id,@Valid @RequestParam("available") Boolean available) {
 
         UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Canteen canteen = getCanteen(userDetails);
@@ -97,13 +110,38 @@ public class FoodManageController {
         }
     }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteItem(@PathVariable("id") Long id) {
-//
-//        foodItemRepository.deleteById(id);
-//
-//        return ResponseEntity.ok("Deleted");
-//    }
+    @PutMapping("/update-order")
+    public ResponseEntity<?> updateOrderStatus(@Valid @RequestParam("id") Long id,@Valid @RequestParam("status") String status) {
+
+        UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        OrderedItem orderedItem = orderedItemRepository.findById(id).orElseThrow(() -> new RuntimeException("Error: OrderItem is not found."));
+
+        Canteen canteen = getCanteen(userDetails);
+
+        if(canteen.getId().equals(orderedItem.getCartfooditem().getCanteen_id()))
+        {
+            orderedItem.setStatus(status);
+            orderedItemRepository.save(orderedItem);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedResponse);
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(forbiddenResponse);
+        }
+    }
+
+    @GetMapping("/orders-by-status")
+    public ResponseEntity<?> getOrdersByStatus(@Valid @RequestParam("status") String status) {
+
+        UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Canteen canteen = getCanteen(userDetails);
+
+        List<OrderedItem> orderedItemList = orderedItemRepository.findAllByStatusEquals(status);
+
+        return ResponseEntity.ok(orderedItemList);
+    }
+
 
     private Canteen getCanteen(UserDetailsImpl userDetails)
     {
