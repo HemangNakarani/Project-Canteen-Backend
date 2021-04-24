@@ -158,6 +158,7 @@ public class CartController {
             orderedItem.setUserid(userDetails.getId());
             orderedItem.setCanteenid(cartItem.getCartfooditem().getCanteen_id());
             orderedItem.setCartfooditem(cartItem.getCartfooditem());
+            orderedItem.setPaid(false);
 
             int amount = cartItem.getQuantity()*cartItem.getCartfooditem().getBasePrise();
 
