@@ -2,6 +2,7 @@ package io.sen.canteenia.controllers;
 
 import io.sen.canteenia.email.EmailSenderService;
 import io.sen.canteenia.email.EmailUtils;
+import io.sen.canteenia.models.Canteen;
 import io.sen.canteenia.models.ERole;
 import io.sen.canteenia.models.Role;
 import io.sen.canteenia.models.User;
@@ -10,6 +11,7 @@ import io.sen.canteenia.payload.request.ResetPasswordRequest;
 import io.sen.canteenia.payload.request.SignupRequest;
 import io.sen.canteenia.payload.response.JwtResponse;
 import io.sen.canteenia.payload.response.MessageResponse;
+import io.sen.canteenia.repository.CanteenRepository;
 import io.sen.canteenia.repository.RoleRepository;
 import io.sen.canteenia.repository.UserRepository;
 import io.sen.canteenia.security.jwt.JwtUtils;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,6 +48,9 @@ public class AuthController {
 
 	@Autowired
 	RoleRepository roleRepository;
+
+	@Autowired
+	CanteenRepository canteenRepository;
 
 	@Autowired
 	PasswordEncoder encoder;
@@ -184,5 +190,18 @@ public class AuthController {
 		}
 
 	}
+
+	@GetMapping("/canteen-details")
+	@PreAuthorize("hasRole('OWNER')")
+	public ResponseEntity<?> getCanteenDetails() {
+
+		UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = new User();
+		user.setId(userDetails.getId());
+		Canteen canteen = canteenRepository.findByOwner(user).orElseThrow(() -> new RuntimeException("Error: Canteen is not found."));
+		return ResponseEntity.ok(canteen);
+	}
+
+
 
 }

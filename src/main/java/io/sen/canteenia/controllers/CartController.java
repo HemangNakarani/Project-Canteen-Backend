@@ -1,22 +1,26 @@
 package io.sen.canteenia.controllers;
 
 import io.sen.canteenia.models.CartItem;
+import io.sen.canteenia.models.ChatMessage;
 import io.sen.canteenia.models.FoodItem;
 import io.sen.canteenia.models.OrderedItem;
 import io.sen.canteenia.payload.request.AddCartItemRequest;
 import io.sen.canteenia.payload.response.*;
 import io.sen.canteenia.repository.CartRepository;
+import io.sen.canteenia.repository.FoodItemRepository;
 import io.sen.canteenia.repository.OrderedItemRepository;
 import io.sen.canteenia.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +32,9 @@ public class CartController {
 
     @Autowired
     CartRepository cartRepository;
+
+    @Autowired
+    FoodItemRepository foodItemRepository;
 
     @Autowired
     OrderedItemRepository orderedItemRepository;
@@ -53,11 +60,10 @@ public class CartController {
         UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CartItem cartItem = new CartItem();
-        FoodItem foodItem = new FoodItem();
+        FoodItem foodItem = foodItemRepository.findById(addCartItemRequest.getFooditem_id()).orElseThrow(() -> new RuntimeException("Error: Can't Find This FoodItem"));
 
         cartItem.setUserid(userDetails.getId());
         cartItem.setQuantity(addCartItemRequest.getQuantity());
-        foodItem.setId(addCartItemRequest.getFooditem_id());
         cartItem.setCartfooditem(foodItem);
 
         if(cartRepository.existsAllByUseridAndCartfooditem(userDetails.getId(),foodItem))
@@ -65,9 +71,9 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(alreadyExistsResponse);
         }
 
-        cartRepository.save(cartItem);
+        CartItem newCartItem = cartRepository.save(cartItem);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCartItem);
     }
 
     @GetMapping("/")
@@ -133,8 +139,11 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedResponse);
     }
 
-    @GetMapping("/checkout")
-    public ResponseEntity<?> checkOut() {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @GetMapping("/checkout/{uuid}")
+    public ResponseEntity<?> checkOut(@PathVariable("uuid") String uuid) {
 
         UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -145,20 +154,21 @@ public class CartController {
             return ResponseEntity.ok(new MessageResponse("Cart is Empty"));
         }
 
-        UUID uuid = UUID.randomUUID();
-        String uuidAsString = uuid.toString();
-
         ArrayList<OrderedItem> orderedItems = new ArrayList<>();
+        HashSet<String> hashSet = new HashSet<>();
 
         listCartItems.forEach((cartItem -> {
 
             OrderedItem orderedItem = new OrderedItem();
 
-            orderedItem.setOrder_token(uuidAsString);
+            orderedItem.setOrder_token(uuid);
             orderedItem.setUserid(userDetails.getId());
             orderedItem.setCanteenid(cartItem.getCartfooditem().getCanteen_id());
             orderedItem.setCartfooditem(cartItem.getCartfooditem());
-            orderedItem.setPaid(false);
+            orderedItem.setQuantity(cartItem.getQuantity());
+            orderedItem.setPaid(true);
+
+            hashSet.add("canteen-"+ cartItem.getCartfooditem().getCanteen_id().toString());
 
             int amount = cartItem.getQuantity()*cartItem.getCartfooditem().getBasePrise();
 
@@ -167,6 +177,12 @@ public class CartController {
             orderedItems.add(orderedItem);
 
         }));
+
+        hashSet.forEach(id ->{
+            messagingTemplate.convertAndSendToUser(
+                    id,"/queue/messages",
+                    new ChatMessage(userDetails.getId().toString(), userDetails.getUsername(), "NEW ORDER","NEW_ORDER"));
+        });
 
         cartRepository.deleteAll(listCartItems);
         orderedItemRepository.saveAll(orderedItems);
@@ -183,7 +199,5 @@ public class CartController {
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(orderedItemList);
     }
-
-
 
 }
