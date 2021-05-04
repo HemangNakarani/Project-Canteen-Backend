@@ -2,7 +2,9 @@ package io.sen.canteenia.controllers;
 
 import io.sen.canteenia.POJO.PaytmDetails;
 import io.sen.canteenia.configuration.PaytmHashConfig;
+import io.sen.canteenia.models.ChatMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +42,8 @@ public class PaymentController {
         return modelAndView;
     }
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping(value = "/pgresponse")
     public String getResponseRedirect(HttpServletRequest request, Model model) {
@@ -78,6 +82,13 @@ public class PaymentController {
         parameters.remove("MID");
 
         model.addAttribute("parameters",parameters);
+
+        String upbhogkarta_ka_username = parameters.get("ORDERID").split("-",0)[0];
+
+        messagingTemplate.convertAndSendToUser(
+                upbhogkarta_ka_username,"/queue/messages",
+                new ChatMessage(parameters.get("ORDERID"),upbhogkarta_ka_username,result,"PAYMENT"));
+
         return "report";
     }
 

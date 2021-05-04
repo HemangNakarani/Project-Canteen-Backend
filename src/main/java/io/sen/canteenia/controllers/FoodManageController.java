@@ -32,8 +32,7 @@ public class FoodManageController {
     @Autowired
     FoodItemRepository foodItemRepository;
 
-    @Autowired
-    CanteenRepository canteenRepository;
+    final CanteenRepository canteenRepository;
 
     @Autowired
     OrderedItemRepository orderedItemRepository;
@@ -46,6 +45,10 @@ public class FoodManageController {
 
     @Autowired
     UpdatedResponse updatedResponse;
+
+    public FoodManageController(CanteenRepository canteenRepository) {
+        this.canteenRepository = canteenRepository;
+    }
 
     @GetMapping("/")
     public ResponseEntity<?> getItems() {
@@ -110,6 +113,16 @@ public class FoodManageController {
         }
     }
 
+    @PutMapping("/set-open")
+    public ResponseEntity<?> setCanteenOpenStatus(@Valid @RequestParam("open") Boolean open) {
+
+        UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Canteen canteen = getCanteen(userDetails);
+        canteen.setOpened(open);
+        canteenRepository.save(canteen);
+        return ResponseEntity.ok(canteen);
+    }
+
     @PutMapping("/update-order")
     public ResponseEntity<?> updateOrderStatus(@Valid @RequestParam("id") Long id,@Valid @RequestParam("status") String status) {
 
@@ -137,7 +150,7 @@ public class FoodManageController {
         UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Canteen canteen = getCanteen(userDetails);
 
-        List<OrderedItem> orderedItemList = orderedItemRepository.findAllByStatusEquals(status);
+        List<OrderedItem> orderedItemList = orderedItemRepository.findAllByStatusEqualsAndCanteenid(status,canteen.getId());
 
         return ResponseEntity.ok(orderedItemList);
     }

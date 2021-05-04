@@ -10,7 +10,11 @@ public interface OrderedItemRepository extends JpaRepository<OrderedItem,Long> {
 
     List<OrderedItem> findAllByUserid(Long id);
 
-    List<OrderedItem> findAllByStatusEquals(String status);
+    List<OrderedItem> findAllByStatusEqualsAndCanteenid(String status,Long id);
+
+    List<OrderedItem> findAllByCanteenid(Long id);
+
+
 
 }
 

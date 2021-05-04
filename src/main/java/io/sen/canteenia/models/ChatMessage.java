@@ -5,6 +5,7 @@ public class ChatMessage {
     String userid;
     String username;
     String message;
+    String Tag;
 
     public ChatMessage() {
     }
@@ -13,6 +14,13 @@ public class ChatMessage {
         this.userid = userid;
         this.username = username;
         this.message = message;
+    }
+
+    public ChatMessage(String userid, String username, String message, String tag) {
+        this.userid = userid;
+        this.username = username;
+        this.message = message;
+        Tag = tag;
     }
 
     public String getUserid() {
@@ -37,5 +45,13 @@ public class ChatMessage {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getTag() {
+        return Tag;
+    }
+
+    public void setTag(String tag) {
+        Tag = tag;
     }
 }
