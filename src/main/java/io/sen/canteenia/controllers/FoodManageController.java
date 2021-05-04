@@ -105,7 +105,7 @@ public class FoodManageController {
         {
             fd.setAvailable(available);
             foodItemRepository.save(fd);
-            return ResponseEntity.ok(fd);
+            return ResponseEntity.ok(updatedResponse);
         }
         else
         {
