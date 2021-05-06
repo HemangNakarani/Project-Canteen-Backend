@@ -1,12 +1,11 @@
 package io.sen.canteenia.controllers;
 
-import io.sen.canteenia.models.Canteen;
-import io.sen.canteenia.models.FoodItem;
-import io.sen.canteenia.models.OrderedItem;
-import io.sen.canteenia.models.User;
+import com.google.gson.Gson;
+import io.sen.canteenia.models.*;
 import io.sen.canteenia.payload.request.AddFoodItemRequest;
 import io.sen.canteenia.payload.request.UpdateFoodItemRequest;
 import io.sen.canteenia.payload.response.ForbiddenResponse;
+import io.sen.canteenia.payload.response.UpdateOrderResponse;
 import io.sen.canteenia.payload.response.UpdatedResponse;
 import io.sen.canteenia.repository.CanteenRepository;
 import io.sen.canteenia.repository.FoodItemRepository;
@@ -16,11 +15,15 @@ import io.sen.canteenia.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -46,6 +49,9 @@ public class FoodManageController {
     @Autowired
     UpdatedResponse updatedResponse;
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
     public FoodManageController(CanteenRepository canteenRepository) {
         this.canteenRepository = canteenRepository;
     }
@@ -67,7 +73,7 @@ public class FoodManageController {
         UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Canteen canteen = getCanteen(userDetails);
 
-        FoodItem foodItem = foodItemRepository.save(new FoodItem(addFoodItemRequest.getName(),addFoodItemRequest.getDescription(),addFoodItemRequest.getBasePrise(),canteen.getId(), addFoodItemRequest.getImage_url()));
+        FoodItem foodItem = foodItemRepository.save(new FoodItem(addFoodItemRequest.getName(),canteen.getCanteenName(),addFoodItemRequest.getDescription(),addFoodItemRequest.getBasePrise(),canteen.getId(), addFoodItemRequest.getImage_url()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(foodItem);
     }
@@ -84,6 +90,7 @@ public class FoodManageController {
         {
             fd.setDescription(updateFoodItemRequest.getDescription());
             fd.setBasePrise(updateFoodItemRequest.getBasePrise());
+            fd.setImage_url(updateFoodItemRequest.getImage_url());
             foodItemRepository.save(fd);
 
             return ResponseEntity.ok(fd);
@@ -135,7 +142,20 @@ public class FoodManageController {
         if(canteen.getId().equals(orderedItem.getCartfooditem().getCanteen_id()))
         {
             orderedItem.setStatus(status);
-            orderedItemRepository.save(orderedItem);
+            OrderedItem neworderedItem = orderedItemRepository.save(orderedItem);
+
+            Gson gson = new Gson();
+            UpdateOrderResponse updateOrderResponse = new UpdateOrderResponse();
+            DateFormat myFormatObj = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            updateOrderResponse.setId(neworderedItem.getId());
+            updateOrderResponse.setStatus(neworderedItem.getStatus());
+            updateOrderResponse.setUndatedAt(myFormatObj.format(neworderedItem.getUndatedAt()));
+
+            messagingTemplate.convertAndSendToUser(
+                    orderedItem.getUsername(),"/queue/messages",
+                    new ChatMessage(canteen.getId().toString(),canteen.getCanteenName(), gson.toJson(updateOrderResponse) ,"ORDER_UPDATE"));
+
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedResponse);
         }
         else

@@ -163,6 +163,8 @@ public class CartController {
 
             orderedItem.setOrder_token(uuid);
             orderedItem.setUserid(userDetails.getId());
+            orderedItem.setUsername(userDetails.getUsername());
+            orderedItem.setUseremail(userDetails.getEmail());
             orderedItem.setCanteenid(cartItem.getCartfooditem().getCanteen_id());
             orderedItem.setCartfooditem(cartItem.getCartfooditem());
             orderedItem.setQuantity(cartItem.getQuantity());
@@ -196,6 +198,8 @@ public class CartController {
         UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<OrderedItem> orderedItemList = orderedItemRepository.findAllByUserid(userDetails.getId());
+
+        orderedItemList.removeIf( obj ->(obj.getStatus().equals("FullFilled")));
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(orderedItemList);
     }

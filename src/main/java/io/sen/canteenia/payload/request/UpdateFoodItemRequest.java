@@ -12,13 +12,16 @@ public class UpdateFoodItemRequest {
     @NotBlank
     private int basePrise;
 
+    private  String image_url;
+
     public UpdateFoodItemRequest() {
     }
 
-    public UpdateFoodItemRequest(@NotBlank Long id, String description, @NotBlank int basePrise) {
+    public UpdateFoodItemRequest(Long id, String description, int basePrise, String image_url) {
         this.id = id;
         this.description = description;
         this.basePrise = basePrise;
+        this.image_url = image_url;
     }
 
     public Long getId() {
@@ -43,5 +46,13 @@ public class UpdateFoodItemRequest {
 
     public void setBasePrise(int basePrise) {
         this.basePrise = basePrise;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 }

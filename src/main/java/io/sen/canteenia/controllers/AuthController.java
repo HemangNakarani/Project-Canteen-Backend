@@ -11,6 +11,7 @@ import io.sen.canteenia.payload.request.ResetPasswordRequest;
 import io.sen.canteenia.payload.request.SignupRequest;
 import io.sen.canteenia.payload.response.JwtResponse;
 import io.sen.canteenia.payload.response.MessageResponse;
+import io.sen.canteenia.payload.response.UpdatedResponse;
 import io.sen.canteenia.repository.CanteenRepository;
 import io.sen.canteenia.repository.RoleRepository;
 import io.sen.canteenia.repository.UserRepository;
@@ -51,6 +52,9 @@ public class AuthController {
 
 	@Autowired
 	CanteenRepository canteenRepository;
+
+	@Autowired
+	UpdatedResponse updatedResponse;
 
 	@Autowired
 	PasswordEncoder encoder;
@@ -202,6 +206,13 @@ public class AuthController {
 		return ResponseEntity.ok(canteen);
 	}
 
-
-
+	@PostMapping("/update-dp")
+	@PreAuthorize("hasRole('USER') or hasRole('OWNER')")
+	public ResponseEntity<?> updateUserProfile(@Valid @RequestParam("dp_url") String dp_url) {
+		UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new RuntimeException("Error: User is not found."));
+		user.setProfile_pic(dp_url);
+		userRepository.save(user);
+		return ResponseEntity.ok(updatedResponse);
+	}
 }
