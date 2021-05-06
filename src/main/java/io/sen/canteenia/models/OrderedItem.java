@@ -17,6 +17,10 @@ public class OrderedItem {
 
     private Long userid;
 
+    private String username;
+
+    private String useremail;
+
     private Long canteenid;
 
     private String order_token;
@@ -46,9 +50,11 @@ public class OrderedItem {
     public OrderedItem() {
     }
 
-    public OrderedItem(Long id, Long userid, Long canteenid, String order_token, int quantity, int amount, String status, FoodItem cartfooditem) {
+    public OrderedItem(Long id, Long userid, String username, String useremail, Long canteenid, String order_token, int quantity, int amount, String status, FoodItem cartfooditem) {
         this.id = id;
         this.userid = userid;
+        this.username = username;
+        this.useremail = useremail;
         this.canteenid = canteenid;
         this.order_token = order_token;
         this.quantity = quantity;
@@ -71,6 +77,22 @@ public class OrderedItem {
 
     public void setUserid(Long userid) {
         this.userid = userid;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUseremail() {
+        return useremail;
+    }
+
+    public void setUseremail(String useremail) {
+        this.useremail = useremail;
     }
 
     public Long getCanteenid() {

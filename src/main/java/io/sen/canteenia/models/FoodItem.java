@@ -20,12 +20,14 @@ public class FoodItem implements Serializable {
 
     private String image_url;
 
+    private String canteenname;
+
     private int stars = 0;
 
     private int number_of_rating = 0;
 
     @JoinColumn(name = "canteen_id", insertable = false, updatable = false)
-    @ManyToOne(targetEntity = Canteen.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Canteen.class, fetch = FetchType.LAZY)
     private Canteen canteen;
 
     @Column(name = "canteen_id")
@@ -34,9 +36,10 @@ public class FoodItem implements Serializable {
     public FoodItem() {
     }
 
-    public FoodItem(String name, String description, int basePrise, Long canteen_id, String image_url) {
+    public FoodItem(String name, String canteenname, String description, int basePrise, Long canteen_id, String image_url) {
         this.name = name;
         this.description = description;
+        this.canteenname = canteenname;
         this.basePrise = basePrise;
         this.canteen_id = canteen_id;
         this.image_url = image_url;
@@ -56,6 +59,14 @@ public class FoodItem implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCanteenname() {
+        return canteenname;
+    }
+
+    public void setCanteenname(String canteenname) {
+        this.canteenname = canteenname;
     }
 
     public String getDescription() {

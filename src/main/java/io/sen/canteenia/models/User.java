@@ -27,6 +27,8 @@ public class User {
 	@Email
 	private String email;
 
+	private String profile_pic;
+
 	@NotBlank
 	@Size(max = 120)
 	private String password;
@@ -84,5 +86,13 @@ public class User {
 
 	public void setRoles(Set<io.sen.canteenia.models.Role> roles) {
 		this.roles = roles;
+	}
+
+	public String getProfile_pic() {
+		return profile_pic;
+	}
+
+	public void setProfile_pic(String profile_pic) {
+		this.profile_pic = profile_pic;
 	}
 }
