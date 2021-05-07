@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -202,6 +203,17 @@ public class CartController {
         orderedItemList.removeIf( obj ->(obj.getStatus().equals("FullFilled")));
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(orderedItemList);
+    }
+
+    @DeleteMapping("/clear")
+    @Transactional
+    public ResponseEntity<?> clearCart()
+    {
+        UserDetailsImpl userDetails =  (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        cartRepository.deleteByUserid(userDetails.getId());
+
+        return ResponseEntity.ok(deletedResponse);
     }
 
 }
