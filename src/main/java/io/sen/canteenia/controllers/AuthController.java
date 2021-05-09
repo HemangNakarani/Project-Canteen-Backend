@@ -35,9 +35,9 @@ import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -106,6 +106,13 @@ public class AuthController {
 					.body(new MessageResponse("Error: Email is already in use!"));
 		}
 
+		if(!Pattern.matches("[0-9]{9}+@daiict.ac.in",signUpRequest.getEmail()))
+		{
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: Email is not in Proper Format !!!"));
+		}
+
 		// Create new user's account
 		User user = new User(signUpRequest.getUsername(),
 							 signUpRequest.getEmail(),
@@ -121,20 +128,6 @@ public class AuthController {
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
-				case "admin":
-					Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(adminRole);
-
-					break;
-
-				case "owner":
-					Role ownerRole = roleRepository.findByName(ERole.ROLE_OWNER)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(ownerRole);
-
-					break;
-
 				default:
 					Role userRole = roleRepository.findByName(ERole.ROLE_USER)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
