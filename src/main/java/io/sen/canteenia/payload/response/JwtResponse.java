@@ -8,14 +8,24 @@ public class JwtResponse {
 	private Long id;
 	private String username;
 	private String email;
+	private String profile_pic;
 	private List<String> roles;
 
-	public JwtResponse(String accessToken, Long id, String username, String email, List<String> roles) {
+	public JwtResponse(String accessToken, Long id, String username, String email, String profile_pic, List<String> roles) {
 		this.token = accessToken;
 		this.id = id;
 		this.username = username;
 		this.email = email;
+		this.profile_pic = profile_pic;
 		this.roles = roles;
+	}
+
+	public String getProfile_pic() {
+		return profile_pic;
+	}
+
+	public void setProfile_pic(String profile_pic) {
+		this.profile_pic = profile_pic;
 	}
 
 	public String getAccessToken() {
