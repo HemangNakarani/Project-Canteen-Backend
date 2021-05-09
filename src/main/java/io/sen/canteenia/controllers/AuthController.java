@@ -85,10 +85,13 @@ public class AuthController {
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 
+		User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new RuntimeException("Error: User not found."));
+
 		return ResponseEntity.ok(new JwtResponse(jwt,
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 
-												 userDetails.getEmail(), 
+												 userDetails.getEmail(),
+												 user.getProfile_pic(),
 												 roles));
 	}
 
@@ -106,11 +109,11 @@ public class AuthController {
 					.body(new MessageResponse("Error: Email is already in use!"));
 		}
 
-		if(!Pattern.matches("[0-9]{9}+@daiict.ac.in",signUpRequest.getEmail()))
+		if(!Pattern.matches("20+[17,18,19,20]+[0-9]{5}+@daiict.ac.in",signUpRequest.getEmail()))
 		{
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Email is not in Proper Format !!!"));
+					.body(new MessageResponse("Error: Email is not in DAIICT Student ID Format !!!"));
 		}
 
 		// Create new user's account
